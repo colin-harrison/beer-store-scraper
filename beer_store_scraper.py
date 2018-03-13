@@ -13,79 +13,54 @@ import requests, bs4, re
 # Get all links for the Lagers
 linksRequest = requests.get('http://www.thebeerstore.ca/beers/search/beer_type--Lager')
 linksText = bs4.BeautifulSoup(linksRequest.text)
-
-sizeRegex = re.compile(r'\d* ml')
-canRegex = re.compile(r'473 ml')
-kegRegex = re.compile(r'30000 ml')
-
 rawLinks = linksText.select('.brand-link')
+
+#sizeRegex = re.compile(r'\d* ml')
+#canRegex = re.compile(r'473 ml')
+#kegRegex = re.compile(r'30000 ml')
+
+sizeRegex = re.compile(r'\d+.*ml')
+volumeRegex = re.compile(r'\d+\sml')
+quantityRegex = re.compile(r'\d+')
+priceRegex = re.compile(r'\d+\.\d{2}')
 linkRegex = re.compile(r'/beers/\w+(-\w+)*')
-nameRegex = re.compile(r'\w+(\s\w+)*')
+nameRegex = re.compile(r'>.*<')
+ABVRegex = re.compile(r'\d+\.\d')
 lagerLinks = []
+lagerList = [] 
+
+# Program only works for lagers as of now.
+# After refactoring it will run through all 4 types.
 
 for i in range(len(rawLinks)):
+    # Get the webpage of this specifc link
     rawLinksString = str(rawLinks[i])
     match = linkRegex.search(rawLinksString)
     fullLink = 'http://www.thebeerstore.ca' + match.group(0)
     beerInfo = requests.get(fullLink)
     beerSoup = bs4.BeautifulSoup(beerInfo.text)
+
+    # Get prices and sizes of the beer
     prices = beerSoup.select('.price')
     sizes = beerSoup.select('.size')
-    nameElement = beerSoup.select('.page-title')
-    
 
+    # Get the name of the beer
+    names = beerSoup.select('.page-title')
+    nameMatch = nameRegex.search(str(names[0]))
+    name = nameMatch.group(0)[1:-1]
 
-# Get all links for the Ales
-linksRequest = requests.get('http://www.thebeerstore.ca/beers/search/beer_type--Ale')
-linksText = bs4.BeautifulSoup(linksRequest.text)
+    # Get the ABV of the beer
+    abvContent = beerSoup.select('dd')
+    abvMatch = ABVRegex.search(str(abvContent))
+    ABV = float(abvMatch.group(0)) / 100
 
-rawLinks = linksText.select('.brand-link')
-linkRegex = re.compile(r'/beers/\w+(-\w+)*')
-aleLinks = []
+    # Iterate through each size option to get the price, size, vol, and quantity of each
+    for j in range(len(prices)):
+        price = priceRegex.search(str(prices[j])).group(0)
+        volume = volumeRegex.search(str(sizes[j])).group(0)
+        quantity = quantityRegex.search(str(sizes[j])).group(0)
+        size = sizeRegex.search(str(sizes[j])).group(0)
+        lagerList.append([name, size, quantity, volume, ABV, price])
+        print([name, size, quantity, volume, ABV, price])
 
-for i in range(len(rawLinks)):
-    rawLinksString = str(rawLinks[i])
-    match = linkRegex.search(rawLinksString)
-    fullLink = 'http://www.thebeerstore.ca' + match.group(0)
-    aleLinks.append(fullLink)
-
-# Get all links for the Malts
-linksRequest = requests.get('http://www.thebeerstore.ca/beers/search/beer_type--Malt')
-linksText = bs4.BeautifulSoup(linksRequest.text)
-
-rawLinks = linksText.select('.brand-link')
-linkRegex = re.compile(r'/beers/\w+(-\w+)*')
-maltLinks = []
-
-for i in range(len(rawLinks)):
-    rawLinksString = str(rawLinks[i])
-    match = linkRegex.search(rawLinksString)
-    fullLink = 'http://www.thebeerstore.ca' + match.group(0)
-    maltLinks.append(fullLink)
-
-# Get all links for the Stouts
-linksRequest = requests.get('http://www.thebeerstore.ca/beers/search/beer_type--Ale')
-linksText = bs4.BeautifulSoup(linksRequest.text)
-
-rawLinks = linksText.select('.brand-link')
-linkRegex = re.compile(r'/beers/\w+(-\w+)*')
-stoutLinks = []
-
-for i in range(len(rawLinks)):
-    rawLinksString = str(rawLinks[i])
-    match = linkRegex.search(rawLinksString)
-    fullLink = 'http://www.thebeerstore.ca' + match.group(0)
-    stoutLinks.append(fullLink)
-
-print(len(lagerLinks))
-print(len(aleLinks))
-print(len(maltLinks))
-print(len(stoutLinks))
-
-# Iterate through the sizes and find all of the sizes minus ml
-# Convert sizes to integers
-# Iterate through both prices and sizes and compile a dictionary
-# Where the size is the key and the value is the price
-
-print(sizes)
-print(prices)
+# TODO: Write lagerList to an Excel Spreadsheet
