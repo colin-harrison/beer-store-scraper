@@ -80,22 +80,22 @@ for counter, beerList in enumerate(beerLists):
     # Set headers and change active sheet
     ws = wb[beerTypes[counter]]
     ws['B3'] = 'Beer'
-    ws['B3'].font = bold11Font
+    #ws['B3'].font = bold11Font
     ws['C3'] = 'Sold as'
-    ws['C3'].font = bold11Font
+    #ws['C3'].font = bold11Font
     ws['D3'] = 'Quantity'
-    ws['D3'].font = bold11Font
+    #ws['D3'].font = bold11Font
     ws['E3'] = 'Volume (ml)'
-    ws['E3'].font = bold11Font
+    #ws['E3'].font = bold11Font
     ws['F3'] = 'ABV'
-    ws['F3'].font = bold11Font
+    #ws['F3'].font = bold11Font
     ws['G3'] = 'Price'
-    ws['G3'].font = bold11Font
+    #ws['G3'].font = bold11Font
     ws['G3'].number_format = '$#.##'
     ws['H3'] = 'Price per Drink'
-    ws['H3'].font = bold11Font
-    ws['G3'].number_format = '$#.##'
-    ws.column_dimensions['B'].width = 24
+    #ws['H3'].font = bold11Font
+    ws['H3'].number_format = '$#.##'
+    ws.column_dimensions['B'].width = 27
     ws.column_dimensions['C'].width = 20
     ws.column_dimensions['H'].width = 12
     
