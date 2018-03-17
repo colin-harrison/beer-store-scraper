@@ -1,6 +1,6 @@
-import requests, re, bs4, lxml
+import requests, re, bs4, lxml, queue
 
-def scrape(beerType):
+def scrape(beerType, q):
 
     # Get all links for the type of beer
     url = 'http://www.thebeerstore.ca/beers/search/beer_type--' + beerType
@@ -48,4 +48,4 @@ def scrape(beerType):
             size = sizeRegex.search(str(sizes[j])).group(0)
             beerList.append([name, size, quantity, volume[:-3], ABV, price]) # remove ' ml'
 
-    return beerList
+    q.put(beerList)
