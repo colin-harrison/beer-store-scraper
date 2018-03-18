@@ -2,9 +2,11 @@
 # This program scrapes thebeerstore.ca for a list of url's to every beer
 # they sell. The beers are categorized into Ale, Lager, Malt & Stout.
 
-import requests, bs4, re, openpyxl, lxml, beer_store_scraper, threading, queue
+import requests, bs4, re, openpyxl, lxml, beer_store_scraper, threading, queue, time
 import insertion_sort as sorting
 from openpyxl import Workbook
+
+t_0 = time.clock()
 
 q = queue.Queue()
 beerTypes = ['Lager', 'Ale', 'Malt', 'Stout']
@@ -33,8 +35,6 @@ for i in range(3):
 beerList = beerList[0]
 # Beer list now formatted properly. Verified by testing.
 
-print('beerList finished')
-
 # Get price per drink for each beer (17.7441 mL alcohol/drink)
 mL_per_drink = 17.7441 # mL
 for i in range(len(beerList)):
@@ -43,12 +43,8 @@ for i in range(len(beerList)):
     costPerDrink = dollars_per_mL * mL_per_drink
     beerList[i].append(costPerDrink)
 
-print('beerList price per drink added')
-
 # Sort beerList by price per drink
 beerList = sorting.sort(beerList)
-
-print('beerList sorted')
 
 # Create a worksheet
 wb = Workbook()
@@ -89,3 +85,5 @@ for i in range(len(beerList)):
     ws[costPerDrinkIndex] = round(beerList[i][6],2)
 
 wb.save('beer_store_catalog_threaded.xlsx')
+
+print(time.clock() - t_0)
