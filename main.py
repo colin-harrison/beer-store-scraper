@@ -3,7 +3,6 @@
 # they sell. The beers are categorized into Ale, Lager, Malt & Stout.
 
 import requests, bs4, re, openpyxl, lxml, beer_store_scraper, threading, queue, time
-import insertion_sort as sorting
 from openpyxl import Workbook
 
 t_0 = time.clock()
@@ -44,7 +43,7 @@ for i in range(len(beerList)):
     beerList[i].append(costPerDrink)
 
 # Sort beerList by price per drink
-beerList = sorting.sort(beerList)
+beerList = sorted(beerList)
 
 # Create a worksheet
 wb = Workbook()
